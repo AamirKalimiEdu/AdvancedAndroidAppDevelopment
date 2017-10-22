@@ -1,0 +1,21 @@
+[submodule "Android_Me"]
+	path = Android_Me
+	url = https://github.com/wookupmaker/Android_Me
+[submodule "AdvancedAndroid_Emojify"]
+	path = AdvancedAndroid_Emojify
+	url = https://github.com/wookupmaker/AdvancedAndroid_Emojify
+[submodule "AdvancedAndroid_Shushme"]
+	path = AdvancedAndroid_Shushme
+	url = https://github.com/wookupmaker/AdvancedAndroid_Shushme
+[submodule "AdvancedAndroid_ClassicalMusicQuiz"]
+	path = AdvancedAndroid_ClassicalMusicQuiz
+	url = https://github.com/wookupmaker/AdvancedAndroid_ClassicalMusicQuiz
+[submodule "AdvancedAndroid_MyGarden"]
+	path = AdvancedAndroid_MyGarden
+	url = https://github.com/wookupmaker/AdvancedAndroid_MyGarden
+[submodule "AdvancedAndroid_Squawker"]
+	path = AdvancedAndroid_Squawker
+	url = https://github.com/wookupmaker/AdvancedAndroid_Squawker
+[submodule "AdvancedAndroid_TeaTime"]
+	path = AdvancedAndroid_TeaTime
+	url = https://github.com/wookupmaker/AdvancedAndroid_TeaTime
