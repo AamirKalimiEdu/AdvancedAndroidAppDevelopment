@@ -48,6 +48,19 @@ And there's a corresponding on destroy view callback that can be called before a
 **Why interfaces?**  
 *To keep fragments modular and reusable, you cannot have them communicate directly with one another or directly tied to a host activity. An interface gives you a way to communicate but also stay modular because it can be implemented by any host activity -- this way the fragment is not tied directly to an activity.*
 
+## Stage 3 [15-10-2017]
+
+*The Support Library includes methods for checking for existing permissions, and requesting new permissions in a backwards compatible way: It will only affect devices running API level 23 or higher, so you don't have to do any API level checks yourself.*
+
+**64K Method Limit**  
+*Another consideration in deciding whether or not to use a library is to be aware of how it will affect the size of your app. When your app, including the libraries it uses, reaches a certain size, you encounter build errors that indicate your app has reached a limit of the Android app build architecture (64K Method Limit). Libraries are commonly used and without a doubt efficient, but do be aware of theses considerations. *
+
+
+
+**What two methods should you use with the FaceDetector.Builder to turn on Classifications and improve performance by disabling tracking (which maintains an ID between consecutive frames if the same face exists in both of them?)**  
+*Great! setClassificationType(FaceDetector.ALL_CLASSIFICATIONS) and setTrackingEnabled(false) are the correct methods.*
+
+>By default bitmaps are immutable meaning we can't change them
 
 
 
