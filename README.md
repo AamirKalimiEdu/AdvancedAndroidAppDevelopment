@@ -62,13 +62,89 @@ And there's a corresponding on destroy view callback that can be called before a
 
 >By default bitmaps are immutable meaning we can't change them
 
+## Stage 4 [16-10-2017]
+
+**Polling**  
+*Polling, when we're talking about client-server communication, is the act of continually pinging the server every so often to see if there are any updates. If you've seen apps using JobSchedulers or sync adapters to connect to a server, more likely than not, the app is using the polling strategy.*  
+
+**Pushing**  
+*The idea behind a pushing strategy is that instead of having your client phone constantly asking the server if there are updates, instead, the server is responsible for telling the phone when it has new information.*  
+
+**FCM Features**  
+1. Automatic Retries  
+2. Mass messages  
+3. Cross-platform  
+4. Scale  
+
+**Add FCM to your project**  
+1. Connect your app to Firebase  
+2. Add FCM to your apps (Setup dependencies correctly)  
+3. Acess the device registration token  
+
+*Download the google-service.json config file and save it in Squawker's app directory. This configuration file is what tells Squawker what Firebase server instance to connect to online. It is specific to the Firebase "app" you just created. If you ever accidentally delete the google-service.json file, you can redownload it, by going to the app Settings.*
+
+**FCM Registration Token**  
+*An FCM registration token is a string of numbers and characters that is used to uniquely identify a device. It's generated when the app first starts and changes, say, if you uninstall and reinstall the app. The FCM server can use these unique tokens to send messages to specific devices. So let's see how you actually find out what the FCM registration token is for your device. There's actually pretty clear online documentation about how to do this. If i scroll down the first step is to create a service that extends from FirebaseInstanceIdService. Like all android components, the service needs to be registered to the manifest. Now to able to catch the event when a token is generated for your device, it's important that you intent filter here It has the action instance ID event. And after extending this service and adding it to the manifest, the only other real thing that you need to do is implement this onTokenRefresh() method And this menthod is part of the FirebaseInstanceIdService class. Functionally, you could od a couple of different things when this method is called.  But for you, you just want to know what the token is, so you can actually print it out in a log.*
+
+>When the firebase console sends a message to the FCM server, it sends what's known as a notification message which looks like a notification with default look and feel by firebase you can change the look and feel if you want. This is the added benefit that on the client phone, it makes the notification appear. FCM has another type of message whic you seee here, known as a data message. The data message looks like this. But the key difference being that instead of saying notification here, it says data. Your app will react differently, depending on whether it will send a notification message or a data message. Notification messages display a message, as long as the app is in the background. They have predefined key value pairs such as the body key with some value. This controls what the body of your notification says. You can also have optional key value pairs that go into the intent extras bundle which is accessible when you launch the app for that notification. Also notification messages can be sent from the Firebase console. Now in comparison, data messages do nothing automatically. And what this means is that you're responsible for adding the code to process the data that comes in. It won't display a notification or anything like that automatically. Because data messages can do almost anything, they have whatever custom key value pairs you'd lie to pass along. Note that as of now, data messages cannot be sent from the firebase console which means that you have to go to the hard work of coding up your own server to send data messages.
+
+Notificaction Message | Data Message
+---|---
+Display notification automatically | Requires you to do all the data processing 
+Predefined key values | All custom key value pairs 
+Extra values in intent extra | -
+Can be sent from firebase console | cannot be sent from firebase console  
+App in Background: shows notification | App in Foreground or Background: Triggers onMessageReceived
+App in Foreground: triggers onMessageReceived(only if you setup the FirebaseMessagingService) | -  
+
+**Notification + Data Messages**  
+1. Cannot be sent fromm the Firebase console
+2. App in the Background: 
+    1. Shows notification, does not trigger onMessageReceived
+    2. The notification has extra in the intent
+3. App in the Foreground
+    1. Trigger onMessageReceived 
 
 
+*To receive and process a data message, you need to implement another service called FirebaseMessagingService. This involves three things. First, you need to create a service that extends FirebaseMessagingService. Then, you need to add that serrvice to the manifest with the MESSAGIN_EVENT intent filter. Finally, you should override the onMessageReceived method, which is inside of FirebaseMessagingService. This will create a service on your client phone that is triggered by incoming FCM data messages, as well as notification messages when the app is in the foreground. This is useful because it means the app can be in the background and get pinged by an FCM data message. And then you can execute whatever code you need in onMessageReceived.*
 
 
+**Choosing Notification vs Data Messages**  
+**Notificaction**  
+1. You want the system to show notification on your behalf
+2. You only need to run code in the foreground
+3. Example: Advertisement or notification for a mobile gmae without the need to change code  
+
+**Data** 
+1. You need to run code, whether the app is in the background or the foreground, choose this option!
+2. Example: Email app that should sync whenever a new message is received  
 
 
+>Luckily, there are a few ways to send data to multiple phones using FCM. Two ways to send data to groups are using DeviceGroups and Topics  
 
+**Device Groups**  
+*Device groups are typically sets of devices that all belong to the same user. For example, if jessica owns two phones and a tablet that all use Squawker, we could store all of these devices together is a device group. The creation of management of these device groups is done on the server side on the app server. Now the squawker server doesn't actually do anything with device groups, and so, it's outside of the scope of this lesson. But i did link some additional information in the notes*  
 
+**Topics**  
+*Topics are a bit like mailing list. some client devices will choose to subscribe to a topic, and then only those devices which subscribed will be sent the messages when the topic sends a message. So what does this actually look like in code? On the server side, instead of sending a message to a specific ID, you could send the message to a topic. A topic is represented by a single string key. For example could use the key currentEvents. Note that the topic key will always come after the word topics surrounded by forward slashes /topics/currentEvents client devices can subscribe and unsubscribe to topics using that key. A device subscribed to a topic will get all the messages sent to that topic.*  
+```java
+// Subscribing to topics
+FirebaseMessaging.getInstance().subscribeToTopic(“japan”);
+FirebaseMessaging.getInstance().subscribeToTopic(”usa”);
+
+// Unsubscribing from a topic
+FirebaseMessaging.getInstance().unsubscribeFromTopic(“usa”);
+```
+
+>OK, so it's uper important to note that the key that you subcribe to, and the key that the server sends the message to, needs to match exactly. 
+
+**There's more to explore in FCM**  
+1. How to write FCM server code 
+2. Managing registration id tokens and groups on an app server
+3. Upstream messages are when to send meaages from your phone to FCM to be sent out to other devices but you know what is downstream messages getting messages from FCm server to your phone
+4. Other message attributes
+    1. Message Lifespan (how long FCM will keep trying to re-ping your device if its offline 
+    2. Message Priority (determine  weather to wake your phone up if it's in doze mode)
+    3. Collapsible/Non-collapsible Messages (Collapse messages are replaced when a new message is sent. For exmaple, let's say that your phone is off, and every time you get a new email, an FCM message tells your phone to sync withe the email server. If your phone is off for a week, you don't need to be told to sync your phone 100 times when you power your phone back on. You just need to be told to sync once.
 
 
